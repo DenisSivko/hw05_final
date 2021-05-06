@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Об авторе проекта{% endblock %}
+{% block content %}
+{% load user_filters %}
+  <main role="main" class="container">
+    <div class="row">
+      <!-- Левый вспомогательный блок -->
+      <div class="col-md-3 mb-3 mt-1">
+        <div class="card">
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <div class="h3">
+                  Об авторе
+                </div> 
+              </li>
+              <li class="list-group-item">
+                <div class="h6 text-muted">
+                  <img src="{% static "images/author.png" %}" width="100%">
+                  <br>
+                  <br>
+                  Меня зовут Сивко Денис. Я автор данного проекта.
+                </div>
+              </li>
+            </ul>                                               
+          </div>                    
+        </div>                
+      </div>
+      <!-- Тело страницы -->
+      <div class="col-md-9">
+        <div class="card-body">                    
+          <div class="card-text">
+            <h4>
+              Всем привет!
+            </h4>
+            <br>
+            <p align="justify">
+              Меня зовут Денис, я — автор данного творения, которое было создано в рамках учебного проекта.
+            </p>
+            <p align="justify">
+              Мне 22, в настоящее время учусь в магистратуре на направлении "Бизнес-информатика". 
+              Диплом бакалавра получал по направлению "Государственное и муниципальное управление".
+              Из предыдущего предложения можно понять, что я в поисках своего жизненного пути :)
+            <p align="justify">
+              Лет 5 назад, в качестве хобби изучал программирование на языке C++, но на поверхностном уровне. 
+              Успел поработать в КПМГ, в IT-консалтинге по проектированию/внедрению автоматизированных систем и понял,
+              что это не совсем то, чем я хотел бы заниматься. Пообщался с коллегами, друзьями и после долгих раздумий, я решил,
+              что хочу попробовать себя в разработке. Именно этот путь привёл меня на курс Яндекс-Практикума.
+            </p>
+            <a href="https://github.com/DenisSivko/" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://t.me/denissivko2306" target="_blank"><i class="fab fa-telegram"></i></a>
+            <a href="mailto:densivko2306@yandex.ru" target="_blank"><i class="fas fa-envelope"></i></a>
+          </div>                    
+        </div>                
+      </div>            
+    </div>        
+  </main>
+{% endblock %}

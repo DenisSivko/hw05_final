@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Технологии проекта{% endblock %}
+{% block content %}
+{% load user_filters %}
+  <main role="main" class="container">
+    <div class="row">
+      <!-- Левый вспомогательный блок -->
+      <div class="col-md-3 mb-3 mt-1">
+        <div class="card">
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <div class="h3">
+                  Технологии
+                </div> 
+              </li>
+              <li class="list-group-item">
+                <div class="h6 text-muted">
+                  <img src="{% static "images/django_technology.png" %}" width="100%">
+                  <br>
+                  <br>
+                  Учебный проект на Django
+                </div>
+              </li>
+            </ul>                                               
+          </div>                    
+        </div>                
+      </div>
+      <!-- Тело страницы -->
+      <div class="col-md-9">
+        <div class="card-body">                    
+          <div class="card-text">
+            <p align="justify">
+              Django — свободный фреймворк для веб-приложений на языке Python, использующий шаблон проектирования MVC. 
+              Проект поддерживается организацией Django Software Foundation.
+            </p>
+            <p align="justify">
+              Сайт на Django строится из одного или нескольких приложений, которые рекомендуется делать отчуждаемыми и подключаемыми. 
+              Это одно из существенных архитектурных отличий этого фреймворка от некоторых других (например, Ruby on Rails).
+              Один из основных принципов фреймворка — DRY (англ. Don't repeat yourself)
+            </p>
+            <p align="justify">
+              Также, в отличие от других фреймворков, обработчики URL в Django конфигурируются явно при помощи регулярных выражений.
+              Для работы с базой данных Django использует собственный ORM, в котором модель данных описывается классами Python, 
+              и по ней генерируется схема базы данных.
+            </p>
+            <p align="justify">
+              В рамках учебного проекта Django был использован следующий стек технологий:
+            </p>
+            <li>Python, html, css, js</li>
+            <li>Django</li>
+            <li>Visual Studio Code</li>
+            <li>Git</li>
+            <li>Bootstrap</li>
+          </div>                    
+        </div>                
+      </div>            
+    </div>        
+  </main>
+{% endblock %}

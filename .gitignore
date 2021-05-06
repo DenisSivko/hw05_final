@@ -1,4 +1,4 @@
-# Byte-compiled / optimized / DLL files
+﻿# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -122,6 +122,18 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+yatube/.mypy_cache
+yatube/__pycache__
+yatube/about/__pycache__
+yatube/about/migrations/__pycache__
+yatube/about/tests/__pycache__
+yatube/posts/__pycache__
+yatube/posts/tests/__pycache__
+yatube/posts/migrations/__pycache__
+yatube/users/__pycache__
+yatube/users/migrations/__pycache__
+yatube/users/templatetags/__pycache__
+yatube/yatube/__pycache__
 .dmypy.json
 dmypy.json
 
@@ -144,9 +156,7 @@ dmypy.json
 .history/
 
 .mypy_cache
-
-# папки со статикой и медиа
-static/
-yatube/posts/static/
-yatube/media/
-
+yatube/static
+.tests
+yatube/posts/static
+yatube/media
