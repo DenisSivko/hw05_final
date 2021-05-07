@@ -14,7 +14,7 @@ from ..models import Follow, Group, Post
 User = get_user_model()
 
 
-MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 SMALL_GIF = (
     b"\x47\x49\x46\x38\x39\x61\x02\x00"
     b"\x01\x00\x80\x00\x00\x00\x00\x00"
@@ -25,7 +25,7 @@ SMALL_GIF = (
 )
 
 
-@override_settings(MEDIA_ROOT=MEDIA_ROOT)
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostPagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -71,7 +71,7 @@ class PostPagesTests(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(MEDIA_ROOT, ignore_errors=True)
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
 
     def setUp(self):
@@ -80,8 +80,8 @@ class PostPagesTests(TestCase):
         self.authorized_client.force_login(user)
         cache.clear()
 
-    def checking_correct_post(self, context_object):
-        first_object = context_object
+    def checking_correct_post(self, post):
+        first_object = post
         post = PostPagesTests.post
         post_id_0 = first_object.id
         text_0 = first_object.text
@@ -94,8 +94,8 @@ class PostPagesTests(TestCase):
         self.assertEqual(group_0, post.group)
         self.assertEqual(image_0, post.image)
 
-    def checking_correct_group(self, context_object):
-        first_object = context_object
+    def checking_correct_group(self, group):
+        first_object = group
         group = PostPagesTests.group
         title_0 = first_object.title
         slug_0 = first_object.slug
@@ -216,7 +216,7 @@ class PaginatorViewsTest(TestCase):
         self.assertEqual(len(response.context.get("page").object_list), 5)
 
 
-@override_settings(MEDIA_ROOT=MEDIA_ROOT)
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class ProfilePagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -249,7 +249,7 @@ class ProfilePagesTests(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(MEDIA_ROOT, ignore_errors=True)
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
 
     def setUp(self):
@@ -258,8 +258,8 @@ class ProfilePagesTests(TestCase):
         self.authorized_client.force_login(user)
         self.guest_client = Client()
 
-    def checking_correct_post(self, context_object):
-        first_object = context_object
+    def checking_correct_post(self, post):
+        first_object = post
         post = ProfilePagesTests.post
         post_id_0 = first_object.id
         text_0 = first_object.text
@@ -272,8 +272,8 @@ class ProfilePagesTests(TestCase):
         self.assertEqual(group_0, post.group)
         self.assertEqual(image_0, post.image)
 
-    def checking_correct_user(self, context_object):
-        second_object = context_object
+    def checking_correct_user(self, user):
+        second_object = user
         testuser = ProfilePagesTests.testuser
         username_1 = second_object.username
         full_name_1 = second_object.get_full_name()

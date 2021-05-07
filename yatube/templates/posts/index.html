@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 {% load cache %}
 {% block title %}Последние обновления на сайте{% endblock %}
+{% block header %}Последние обновления на сайте{% endblock %}
 {% block content %}
 
-<div class="container">
   {% include "includes/menu.html" with index=True %}
 
-  <h1>Последние обновления на сайте</h1>
   <!-- Вывод ленты записей -->
   {% cache 20 index_page %}
     {% for post in page %}
@@ -18,6 +17,5 @@
   {% if page.has_other_pages %}
     {% include "includes/paginator.html" with items=page paginator=paginator %}
   {% endif %}
-</div>
 
 {% endblock %}

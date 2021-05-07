@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Подписки{% endblock %}
+{% block header %}Посты авторов, на которых вы подписаны{% endblock %}
 {% block content %}
 
-<div class="container">
   {% include "includes/menu.html" with follow=True %}
 
-  <h1>Посты авторов, на которых вы подписаны</h1>
   <!-- Вывод ленты записей -->
   {% for post in page %}
     {% include "includes/post_item.html" with post=post %}
@@ -15,6 +14,5 @@
   {% if page.has_other_pages %}
     {% include "includes/paginator.html" with items=page paginator=paginator %}
   {% endif %}
-</div>
 
 {% endblock %}
