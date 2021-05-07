@@ -36,7 +36,7 @@ class PostsURLTests(TestCase):
             ("/", "posts/index.html"),
             (f"/group/{cls.group.slug}/", "group.html"),
             (f"/{cls.post.author}/", "posts/profile.html"),
-            (f"/{cls.post.author}/1/", "posts/post.html")
+            (f"/{cls.post.author}/{cls.post.id}/", "posts/post.html")
         )
         cls.templates_url_names = (
             *cls.templates_auth_users_url_names,

@@ -24,7 +24,6 @@ class PostForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
-    text = forms.CharField(widget=forms.Textarea)
 
     class Meta:
         model = Comment

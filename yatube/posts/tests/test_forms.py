@@ -3,6 +3,7 @@ import tempfile
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -40,6 +41,7 @@ class PostFormTests(TestCase):
         user = PostFormTests.testuser
         self.authorized_client = Client()
         self.authorized_client.force_login(user)
+        cache.clear()
 
     def test_new_post(self):
         post_count = Post.objects.count()
@@ -75,12 +77,16 @@ class PostFormTests(TestCase):
         }
         response = self.authorized_client.post(
             reverse(
-                "post_edit", kwargs={"username": "testuser", "post_id": "1"}
+                "post_edit", kwargs={
+                    "username": f"{PostFormTests.testuser.username}",
+                    "post_id": f"{PostFormTests.post.id}"}
             ),
             data=form_data,
             follow=True
         )
         self.assertRedirects(response, reverse(
-            "post_view", kwargs={"username": "testuser", "post_id": "1"})
+            "post_view", kwargs={
+                "username": f"{PostFormTests.testuser.username}",
+                "post_id": f"{PostFormTests.post.id}"})
         )
         self.assertEqual(Post.objects.count(), post_count)

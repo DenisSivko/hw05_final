@@ -1,5 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Добавить запись{% endblock %}
+{% block title %}
+  {% if is_new %}
+    Добавить запись
+  {% else %}
+    Редактировать запись
+  {% endif %}
+{% endblock %}
 {% block content %}
 {% load user_filters %}
 

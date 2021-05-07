@@ -1,12 +1,12 @@
-import os
 import shutil
+import tempfile
 
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from ..models import Follow, Group, Post
@@ -14,22 +14,25 @@ from ..models import Follow, Group, Post
 User = get_user_model()
 
 
+MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+SMALL_GIF = (
+    b"\x47\x49\x46\x38\x39\x61\x02\x00"
+    b"\x01\x00\x80\x00\x00\x00\x00\x00"
+    b"\xFF\xFF\xFF\x21\xF9\x04\x00\x00"
+    b"\x00\x00\x00\x2C\x00\x00\x00\x00"
+    b"\x02\x00\x01\x00\x00\x02\x02\x0C"
+    b"\x0A\x00\x3B"
+)
+
+
+@override_settings(MEDIA_ROOT=MEDIA_ROOT)
 class PostPagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.list_dir = os.listdir(os.getcwd())
-        small_gif = (
-            b"\x47\x49\x46\x38\x39\x61\x02\x00"
-            b"\x01\x00\x80\x00\x00\x00\x00\x00"
-            b"\xFF\xFF\xFF\x21\xF9\x04\x00\x00"
-            b"\x00\x00\x00\x2C\x00\x00\x00\x00"
-            b"\x02\x00\x01\x00\x00\x02\x02\x0C"
-            b"\x0A\x00\x3B"
-        )
         uploaded = SimpleUploadedFile(
             name="small.gif",
-            content=small_gif,
+            content=SMALL_GIF,
             content_type="image/gif"
         )
         cls.testuser = User.objects.create_user(
@@ -68,19 +71,17 @@ class PostPagesTests(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
-        for path in os.listdir(os.getcwd()):
-            if path not in cls.list_dir:
-                shutil.rmtree(path, ignore_errors=True)
+        shutil.rmtree(MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
 
     def setUp(self):
         user = PostPagesTests.testuser
         self.authorized_client = Client()
         self.authorized_client.force_login(user)
+        cache.clear()
 
-    def checking_correct_post(self, obj):
-        first_object = obj
+    def checking_correct_post(self, context_object):
+        first_object = context_object
         post = PostPagesTests.post
         post_id_0 = first_object.id
         text_0 = first_object.text
@@ -93,8 +94,8 @@ class PostPagesTests(TestCase):
         self.assertEqual(group_0, post.group)
         self.assertEqual(image_0, post.image)
 
-    def checking_correct_group(self, obj):
-        first_object = obj
+    def checking_correct_group(self, context_object):
+        first_object = context_object
         group = PostPagesTests.group
         title_0 = first_object.title
         slug_0 = first_object.slug
@@ -156,6 +157,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(len(response.context["page"]), 0)
 
     def test_cache_index(self):
+        response = self.authorized_client.get(reverse("index"))
         form_data_for_cache = {
             "text": "Проверка кэша",
         }
@@ -183,14 +185,14 @@ class PaginatorViewsTest(TestCase):
             slug="Test",
             description="Тестовое описание"
         )
-        i = 0
-        while i < 15:
-            cls.post = Post.objects.create(
+        post_list = [
+            Post(
                 text=f"Тест {i}",
                 author=cls.testuser1,
                 group=cls.group
-            )
-            i += 1
+            ) for i in range(15)
+        ]
+        Post.objects.bulk_create(post_list)
 
     def test_index_first_page_contains_ten_records(self):
         response = self.client.get(reverse("index"))
@@ -214,22 +216,14 @@ class PaginatorViewsTest(TestCase):
         self.assertEqual(len(response.context.get("page").object_list), 5)
 
 
+@override_settings(MEDIA_ROOT=MEDIA_ROOT)
 class ProfilePagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.list_dir = os.listdir(os.getcwd())
-        small_gif = (
-            b"\x47\x49\x46\x38\x39\x61\x02\x00"
-            b"\x01\x00\x80\x00\x00\x00\x00\x00"
-            b"\xFF\xFF\xFF\x21\xF9\x04\x00\x00"
-            b"\x00\x00\x00\x2C\x00\x00\x00\x00"
-            b"\x02\x00\x01\x00\x00\x02\x02\x0C"
-            b"\x0A\x00\x3B"
-        )
         uploaded = SimpleUploadedFile(
             name="small.gif",
-            content=small_gif,
+            content=SMALL_GIF,
             content_type="image/gif"
         )
         cls.testuser = User.objects.create_user(
@@ -255,10 +249,7 @@ class ProfilePagesTests(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
-        for path in os.listdir(os.getcwd()):
-            if path not in cls.list_dir:
-                shutil.rmtree(path, ignore_errors=True)
+        shutil.rmtree(MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
 
     def setUp(self):
@@ -267,8 +258,8 @@ class ProfilePagesTests(TestCase):
         self.authorized_client.force_login(user)
         self.guest_client = Client()
 
-    def checking_correct_post(self, obj):
-        first_object = obj
+    def checking_correct_post(self, context_object):
+        first_object = context_object
         post = ProfilePagesTests.post
         post_id_0 = first_object.id
         text_0 = first_object.text
@@ -281,8 +272,8 @@ class ProfilePagesTests(TestCase):
         self.assertEqual(group_0, post.group)
         self.assertEqual(image_0, post.image)
 
-    def checking_correct_user(self, obj):
-        second_object = obj
+    def checking_correct_user(self, context_object):
+        second_object = context_object
         testuser = ProfilePagesTests.testuser
         username_1 = second_object.username
         full_name_1 = second_object.get_full_name()
@@ -360,7 +351,7 @@ class FollowCommentTests(TestCase):
         self.following_client.force_login(following)
         self.guest_user_client = Client()
 
-    def test_follow_unfollow(self):
+    def test_follow(self):
         self.follower_client.get(
             reverse(
                 "profile_follow",
@@ -368,6 +359,8 @@ class FollowCommentTests(TestCase):
             )
         )
         self.assertEqual(Follow.objects.count(), 1)
+
+    def test_unfollow(self):
         self.follower_client.get(
             reverse(
                 "profile_unfollow",
@@ -402,7 +395,7 @@ class FollowCommentTests(TestCase):
     def test_comment(self):
         self.follower_client.post(
             f"/{FollowCommentTests.following.username}/"
-            f"{FollowCommentTests.post.id}/comment",
+            f"{FollowCommentTests.post.id}/comment/",
             {"text": "Тестовый комментарий"}
         )
         response = self.follower_client.get(
@@ -412,7 +405,7 @@ class FollowCommentTests(TestCase):
         self.assertContains(response, "Тестовый комментарий")
         self.guest_user_client.post(
             f"/{FollowCommentTests.following.username}/"
-            f"{FollowCommentTests.post.id}/comment",
+            f"{FollowCommentTests.post.id}/comment/",
             {"text": "Комментарий гостя"}
         )
         response = self.guest_user_client.get(

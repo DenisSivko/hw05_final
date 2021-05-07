@@ -21,7 +21,7 @@
         <!-- Количество записей -->
         Записей: {{ author_card.posts.count }}
       </div>
-      {% if author_card.username != user.username %}
+      {% if author_card.username != user.username and request.user.is_authenticated %}
         <li class="list-group-item">
           {% if following %}
             <a class="btn btn-lg btn-light" 

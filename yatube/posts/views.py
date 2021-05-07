@@ -48,8 +48,11 @@ def profile(request, username):
     paginator = Paginator(post_list, ENTRIES_ON_PAGE)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    following = Follow.objects.filter(
-        user=request.user.id, author=author_card.id
+    following = (
+        request.user.is_authenticated
+        and Follow.objects.filter(
+            user=request.user, author=author_card
+        ).exists()
     )
     return render(request, "posts/profile.html", {
         "page": page,
@@ -59,12 +62,15 @@ def profile(request, username):
 
 
 def post_view(request, username, post_id):
-    author_card = get_object_or_404(User, username=username)
     post = get_object_or_404(Post, pk=post_id, author__username=username)
+    author_card = post.author
     form = CommentForm()
     comments = post.comments.all()
-    following = Follow.objects.filter(
-        user=request.user.id, author=author_card.id
+    following = (
+        request.user.is_authenticated
+        and Follow.objects.filter(
+            user=request.user, author=author_card
+        ).exists()
     )
     return render(request, "posts/post.html", {
         "author_card": author_card,
@@ -85,7 +91,7 @@ def post_edit(request, username, post_id):
     )
     if request.method == "GET" or not form.is_valid():
         return render(request, "posts/new.html", {"form": form, "post": post})
-    post.save()
+    form.save()
     return redirect("post_view", username=username, post_id=post_id)
 
 
@@ -106,12 +112,11 @@ def server_error(request):
 def add_comment(request, username, post_id):
     post = get_object_or_404(Post, pk=post_id, author__username=username)
     form = CommentForm(request.POST or None)
-    if request.method == "GET" or not form.is_valid():
-        return redirect("post_view", username=username, post_id=post_id)
-    comment = form.save(commit=False)
-    comment.author = request.user
-    comment.post = post
-    comment.save()
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = request.user
+        comment.post = post
+        comment.save()
     return redirect("post_view", username=username, post_id=post_id)
 
 
@@ -136,5 +141,5 @@ def profile_follow(request, username):
 def profile_unfollow(request, username):
     author = get_object_or_404(User, username=username)
     if request.user != author:
-        Follow.objects.get(user=request.user, author=author).delete()
+        Follow.objects.filter(user=request.user, author=author).delete()
     return redirect("profile", username=username)
